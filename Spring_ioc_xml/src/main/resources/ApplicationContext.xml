@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="studentOne" class="pojo.Student"></bean>
+
+    <bean id="studentTwo" class="pojo.Student">
+        <property name="sId" value="1001"></property>
+        <property name="sName" value="zhangsan"></property>
+        <property name="age" value="23"></property>
+        <property name="gender" value="男"></property>
+    </bean>
+
+    <bean id="studentThree" class="pojo.Student">
+        <constructor-arg value="1002"></constructor-arg>
+        <constructor-arg value="lisi"></constructor-arg>
+        <constructor-arg value="24"></constructor-arg>
+        <constructor-arg value="女"></constructor-arg>
+    </bean>
+
+    <bean id="teacherOne" class="pojo.Teacher">
+        <property name="tId" value="1"></property>
+        <property name="tName" value="t1"></property>
+    </bean>
+
+    <bean id="teacherTwo" class="pojo.Teacher">
+        <property name="tId" value="2"></property>
+        <property name="tName" value="t2"></property>
+    </bean>
+
+    <bean id="studentFour" class="pojo.Student">
+        <property name="sId" value="1003"></property>
+        <property name="sName" value="wangwu"></property>
+        <property name="age" value="25"></property>
+        <property name="gender" value="男"></property>
+        <property name="cls" ref="classOne"></property>
+<!--        <property name="teacherMap">-->
+<!--            <map>-->
+<!--                <entry key="1" value-ref="teacherOne"></entry>-->
+<!--                <entry key="2" value-ref="teacherTwo"></entry>-->
+<!--            </map>-->
+<!--        </property>-->
+        <property name="teacherMap" ref="TeacherMap"></property>
+    </bean>
+
+    <util:map id="TeacherMap">
+        <entry key="1" value-ref="teacherOne"></entry>
+        <entry key="2" value-ref="teacherTwo"></entry>
+    </util:map>
+
+    <util:list id="studentList">
+        <ref bean="studentOne"></ref>
+        <ref bean="studentTwo"></ref>
+        <ref bean="studentThree"></ref>
+    </util:list>
+
+    <bean id="classOne" class="pojo.Class">
+        <property name="cId" value="1"></property>
+        <property name="cName" value="1班"></property>
+<!--        <property name="students">-->
+<!--            <list>-->
+<!--                <ref bean="studentOne"></ref>-->
+<!--                <ref bean="studentTwo"></ref>-->
+<!--                <ref bean="studentThree"></ref>-->
+<!--            </list>-->
+<!--        </property>-->
+        <property name="students" ref="studentList"></property>
+    </bean>
+
+    <bean id="studentFive" class="pojo.Student">
+        <property name="sId" value="1003"></property>
+        <property name="sName" value="wangwu"></property>
+        <property name="age" value="25"></property>
+        <property name="gender" value="男"></property>
+        <property name="cls" ref="classOne"></property>
+        <property name="cls.cId" value="2"></property>
+        <property name="cls.cName" value="2班"></property>
+    </bean>
+
+    <bean id="studentSix" class="pojo.Student">
+        <property name="sId" value="1003"></property>
+        <property name="sName" value="wangwu"></property>
+        <property name="age" value="25"></property>
+        <property name="gender" value="男"></property>
+        <property name="cls">
+            <bean id="classInner" class="pojo.Class">
+                <property name="cId" value="3"></property>
+                <property name="cName" value="3班"></property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="studentSeven" class="pojo.Student">
+        <property name="sId" value="1003"></property>
+        <property name="sName" value="wangwu"></property>
+        <property name="age" value="25"></property>
+        <property name="gender" value="男"></property>
+        <property name="cls">
+            <bean id="classInner" class="pojo.Class">
+                <property name="cId" value="3"></property>
+                <property name="cName" value="3班"></property>
+            </bean>
+        </property>
+        <property name="hobbies">
+            <array>
+                <value>抽烟</value>
+                <value>喝酒</value>
+                <value>烫头</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="studentEight" class="pojo.Student"
+          p:sId="1006"
+          p:age="18"></bean>
+
+</beans>
