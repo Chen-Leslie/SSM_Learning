@@ -220,3 +220,102 @@
             p:age="18">
       </bean>
       ```
+#### 2.2.4 管理数据源与引入外部属性文件
+  - 通过xml文件配置(类似配置bean)
+  ```xml
+  <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+    <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+    <property name="url" value="jdbc:mysql://localhost:3306/ssm?serverTimezone=UTC"></property>
+    <property name="username" value="root"></property>
+    <property name="password" value="123456"></property>
+  </bean>
+   ```
+  - 通过jdbc.properties文件配置，最后在IOC容器中引入。 通过${key}方式访问value
+  ```xml
+  <context:property-placeholder location="jdbc.properties"></context:property-placeholder>
+   <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+      <property name="driverClassName" value="${jdbc.driver}"></property>
+      <property name="url" value="${jdbc.url}"></property>
+      <property name="username" value="${jdbc.username}"></property>
+      <property name="password" value="${jdbc.password}"></property>
+   </bean>
+   ```
+  #### 2.2.5 bean的作用域
+  - 概念
+  <p>在Spring中可以通过配置bean标签的scope属性来指定bean的作用域范围，各取值含义参考下表
+  
+  | 取值  |  含义  | 创建对象的时机  |
+  |:----:|:--------:|:---:|
+  | singleton(default)   | 在IOC容器中，该对象始终为单例  |IOC容器初始化时|
+  |prototype|在IOC容器中，该对象具有多个实例|获取bean时|
+  <p>如果是在WebApplicationContext环境下还会有另外两个作用域（但不常用）：
+  
+  | 取值  |     含义     |
+  :----------:|:--------:
+  | request |在一个请求范围内有效  |
+  | session | 在一个会话范围内有效 |
+  #### 2.2.6 bean的生命周期
+  - 实例化
+  - 依赖注入
+  - bean对象初始化之前操作(IOC的后置处理器postProcessBeforeInitialization负责)
+  - 初始化，需要通过bean的InitMethod指定初始化方法
+  - bean对象初始化之后操作(IOC的后置处理器postProcessAfterInitialization负责)
+  - bean对象就绪可以使用
+  - IOC容器关闭时销毁，需要通过bean的DestroyMethod方法指定销毁方法
+  ```java
+     /**
+      * 注意：
+      * 若bean的作用域为单例时，实例化、依赖注入以及初始化操作会在获取IOC容器时完成
+      * 若bean的作用域为多例时，实例化、依赖注入以及初始化操作会在获取bean时完成
+      */
+  ```
+  - bean的后置处理器：
+    - 能够在生命周期初始化之前之后添加操作，需要实现BeanPostProcessor接口，且将实现类配置到IOC容器中。
+    - 后置处理器对所有的Bean对象都起作用。
+    ```java
+        public class MyBeanPostProcessor implements BeanPostProcessor {
+            @Override
+            // 在Bean生命周期初始化之前执行
+            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+                System.out.println("MyBeanPostProcessor---->后置处理器postProcessBeforeInitialization");
+                return bean;
+            }
+            @Override
+            // 在Bean生命周期初始化之后执行
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                System.out.println("MyBeanPostProcessor---->后置处理器postProcessAfterInitialization");
+                return bean;
+            }
+        }
+    ```
+#### 2.2.7 FactoryBean
+  - 简介：
+    <p>FactoryBean是Spring提供的一种整合第三方框架的常用机制。和普通的bean不同，配置一个
+    FactoryBean类型的bean，在获取bean的时候得到的并不是class属性中配置的这个类的对象，而是
+    getObject()方法的返回值。
+    <p>FactoryBean是一个接口，需要创建一个类实现该接口
+    <p>其中有三种方法：getObject()：设置一个对象交给IOC容器管理、getObjectType()：设置所提供对象的类型、isSingleton()：所提供的对象是否单例。
+    <p>当把FactoryBean的实现类配置为bean时，会将当前类中的getObject()所返回的对象交给IOC容器管理。
+    <p>相较于普通的Factory模式，不需要再获取Factory对象，直接就能获取Factory生成的对象。
+  - 创建类UserFactoryBean
+  ```java
+    public class UserFactoryBean implements FactoryBean {
+        @Override
+        public Object getObject() throws Exception {
+            return new User();
+        }
+        @Override
+        public Class<?> getObjectType() {
+            return User.class;
+        }
+    }
+  ```
+  - 配置bean
+  ```xml
+   <bean class="factory.UserFactoryBean"></bean>
+  ```
+  - 测试
+  ```java
+    ApplicationContext ioc = new ClassPathXmlApplicationContext("Spring-factoryBean.xml");
+    User user = ioc.getBean(User.class);
+  ```

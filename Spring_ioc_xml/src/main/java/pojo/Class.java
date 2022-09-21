@@ -7,7 +7,7 @@ import java.util.List;
  * @version 1.0
  * @date 2022-09-20
  */
-public class Class {
+public class Class implements Person{
     private Integer cId;
     private String cName;
     private List<Student> students;
