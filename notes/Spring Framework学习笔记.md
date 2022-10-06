@@ -334,4 +334,60 @@
   - 和 XML 配置文件一样，注解本身并不能执行，注解本身仅仅只是做一个标记，具体的功能是框架检测
     到注解标记的位置，然后针对这个位置按照注解标记的功能来执行具体操作。 
   - 本质上：所有一切的操作都是Java代码来完成的，XML和注解只是告诉框架中的Java代码如何执行。
+#### 2.3.2 标识组件的常用注解
+  - @Component：将类标识为普通组件
+  - @Controller：将类标识为控制层组件
+  - @Service：将类标识为业务层组件
+  - @Repository：将类标识为持久层组件
+#### 2.3.3 扫描组件
+  - 通过context:component-scan标签扫描组件
+  - 通过context:component-scan的子标签中的context:exclude-filter来排除不需要扫描的组件，其中type设置排除扫描的方式，type="annotation/assignable"，
+    - annotation：根据注解的类型进行排除，expression需要设置排除的注解的全类名
+    - assignable：根据类的类型进行排除，expression需要设置排除的类的全类名 
+    ```xml
+    <!--  扫描组件  -->
+    <context:component-scan base-package="com.controller, com.dao.impl, com.service.impl">
+      <!--  不扫描谁（不扫描controller类型的注解）  -->
+      <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+      <!--  不扫描谁（不扫描UserController类）  -->
+      <context:exclude-filter type="assignable" expression="com.controller.UserController"/>
+    </context:component-scan>
+    ```
+  - 通过context:component-scan的子标签中的context:include-filter来排除不需要扫描的组件，其中type设置排除扫描的方式，type="annotation/assignable"，注意在此类情况下，需要在context:component-scan中设置use-default-filters="false"
+    ```xml
+    <!--  扫描组件  -->
+    <context:component-scan base-package="com.controller, com.dao.impl, com.service.impl" use-default-filters="false>
+      <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+#### 2.3.4 自动注入
+  - 使用@Autowired能够注解装配的位置
+    - 标识在成员变量上，此时不需要设置set方法
+    - 标识在set方法上
+    - 为当前成员变量赋值的有参构造上
+  - 自动装配实现过程
+    - 通过byType的方式，在IOC容器中通过类型匹配某个bean为属性赋值
+    - 若有多个类型匹配的bean，则会自动转换为byName的方式实现自动装配的效果
+      - 即将要复制的属性的属性名作为bean的id匹配某个bean为属性赋值
+    - 若byType与byName都不能实现自动装配，即此时IOC容器中，有多个类型匹配的bean，并且id与要赋值的变量名都不相同，此时会报错 
+      - 可以通过@Qualifier("id")注解来指定某id的bean来赋值
+  ```java
+    @Autowired
+  ```
+
+
+## 3. AOP
+### 3.1 代理模式
+  - 通过提供一个代理类，让我们在调用目标方法时，不再是直接对目标方法进行调用，而是通过代理类间接调用。让不属于目标方法核心逻辑的代码从目标方法中剥离出来，调用目标方法时先调用代理对象的方法，减少对目标方法的调用和打扰，同时利于维护。
+  - 在核心类里实现核心功能，在代理类中对核心类进行功能增强。
+#### 3.1.1 静态代理
+  <p>静态代理代码属于写死的，不具备灵活性，例如：写死了实现类，当有另一个类需要同样的日志功能时，不能很好的进行代理。
+  <p>因此，提出进一步的需求，将日志功能集中到一个代理类中，将来有任何的日志需求，都通过这一个代理类来实现，即动态代理技术
+
+#### 3.1.2 动态代理
+  - 利用jdk的api实现动态代理——要求必须有接口，最终生成的代理类和目标类实现相同的接口，且在com.sun.proxy包下
+    - Proxy.newProxyInstance(ClassLoader loader, Class<?>[] interfaces, InvocationHandler h)
+      - ClassLoader loader:类加载器，指定加载动态生成的代理类的类加载器。
+      - Class<?>[] interfaces：获取目标对象实现的所有接口的class对象的数组。
+      - InvocationHandler h：设置代理类中的抽象方法如何重写
+  - cglib动态代理——最终生成的代理类会继承目标类，并且和目标类在相同的包下。
 

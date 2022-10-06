@@ -6,4 +6,5 @@ package com.service;
  * @date 2022-09-22
  */
 public interface UserService {
+ void saveUser();
 }
