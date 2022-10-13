@@ -391,3 +391,55 @@
       - InvocationHandler h：设置代理类中的抽象方法如何重写
   - cglib动态代理——最终生成的代理类会继承目标类，并且和目标类在相同的包下。
 
+### 3.2 AOP概述与相关术语
+#### 3.2.1 AOP概述
+  <p>AOP是一种设计思想，面向切面编程</p>
+
+#### 3.2.2 相关术语
+  - 横切关注点
+  - 通知
+    - 前置通知 在被代理的目标方法前执行
+    - 返回通知 在被代理的目标方法成功执行后执行
+    - 异常通知 在被代理的目标方法异常结束后执行
+    - 后置通知 在被代理的目标方法最终结束后执行
+    - 环绕通知 使用try catch finally结构围绕整个被代理的目标方法，包括上面四种
+  - 切面：封装通知方法的类
+  - 目标：被代理的目标对象
+  - 代理：向目标对象应用通知之后创建的代理对象
+  - 连接点
+  - 切入点：定位连接点的方式，本质是一个表达式
+
+#### 3.2.3 作用：
+  - 简化代码
+  - 代码增强
+
+### 3.3 基于注解的AOP
+#### 3.3.1 AOP的注意事项
+  - 切面类和目标类都需要交给IOC容器来管理
+  - 利用org.aspectj.lang.annotation.Aspect下的@Aspect将切面类标识为切面
+  - 在spring的配置文件中利用<aop:aspectj-autoproxy/>开启基于注解的AOP
+  - 在切面中，需要通过指定的注解将方法标识为通知方法
+    - @Before()：前置通知，在目标对象方法执行之前执行
+    - @After()：后置通知，在目标对象方法的finally子句中执行
+    - @AfterReturning(): 返回通知，在目标对象返回值之后执行
+    - @AfterThrowing(): 异常通知，在在目标对象方法的catch子句中执行
+    - @Around(): 环绕通知，环绕通知方法的返回值一定要和目标方法的返回值一致
+  - 切入点表达式：添加在标识通知的注解的value属性中，"execution(...)"，
+    - 在execution里可以用*表示通配符，在参数列表里可以用..代替
+    - execution(public int com.SpringLearning.annotation.CalculatorImpl.add(int, int))
+    - execution(* com.SpringLearning.annotation.CalculatorImpl.*(..))
+      - 第一个*表示任意的访问修饰符与任意的返回值类型
+      - 第二个*表示类中任意的方法
+      - ..表示任意的参数
+      - 类的地方也可以使用*代替，表示包下所有的类
+    - 切入点的重用：
+    ```java
+        // 声明一个公共的切入点
+        @Pointcut("execution(* com.SpringLearning.annotation.CalculatorImpl.*(..))")
+    
+        public void PointCut(){}
+        
+        @Before("PointCut()")
+    ```
+  - 连接点信息：在通知方法的参数位置设置JoinPoint类型的参数，就可以获取连接点所对应方法的信息
+  - 
