@@ -3,7 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="student" class="pojo.Student" scope="singleton">
+    <bean id="student" class="com.SprintLearning.transaction.pojo.Student" scope="singleton">
         <property name="sId" value="101"></property>
         <property name="sName" value="zhangsan"></property>
     </bean>

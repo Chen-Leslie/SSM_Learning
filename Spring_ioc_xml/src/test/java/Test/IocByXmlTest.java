@@ -3,7 +3,7 @@ package Test;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import pojo.Student;
+import com.SprintLearning.transaction.pojo.Student;
 
 /**
  * @author cbr

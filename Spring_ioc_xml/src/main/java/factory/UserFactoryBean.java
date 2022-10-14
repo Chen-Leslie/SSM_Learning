@@ -1,7 +1,7 @@
 package factory;
 
 import org.springframework.beans.factory.FactoryBean;
-import pojo.User;
+import com.SprintLearning.transaction.pojo.User;
 import java.lang.Class;
 
 /**

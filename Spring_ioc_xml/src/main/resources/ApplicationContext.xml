@@ -4,33 +4,33 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="studentOne" class="pojo.Student"></bean>
+    <bean id="studentOne" class="com.SprintLearning.transaction.pojo.Student"></bean>
 
-    <bean id="studentTwo" class="pojo.Student">
+    <bean id="studentTwo" class="com.SprintLearning.transaction.pojo.Student">
         <property name="sId" value="1001"></property>
         <property name="sName" value="zhangsan"></property>
         <property name="age" value="23"></property>
         <property name="gender" value="男"></property>
     </bean>
 
-    <bean id="studentThree" class="pojo.Student">
+    <bean id="studentThree" class="com.SprintLearning.transaction.pojo.Student">
         <constructor-arg value="1002"></constructor-arg>
         <constructor-arg value="lisi"></constructor-arg>
         <constructor-arg value="24"></constructor-arg>
         <constructor-arg value="女"></constructor-arg>
     </bean>
 
-    <bean id="teacherOne" class="pojo.Teacher">
+    <bean id="teacherOne" class="com.SprintLearning.transaction.pojo.Teacher">
         <property name="tId" value="1"></property>
         <property name="tName" value="t1"></property>
     </bean>
 
-    <bean id="teacherTwo" class="pojo.Teacher">
+    <bean id="teacherTwo" class="com.SprintLearning.transaction.pojo.Teacher">
         <property name="tId" value="2"></property>
         <property name="tName" value="t2"></property>
     </bean>
 
-    <bean id="studentFour" class="pojo.Student">
+    <bean id="studentFour" class="com.SprintLearning.transaction.pojo.Student">
         <property name="sId" value="1003"></property>
         <property name="sName" value="wangwu"></property>
         <property name="age" value="25"></property>
@@ -56,7 +56,7 @@
         <ref bean="studentThree"></ref>
     </util:list>
 
-    <bean id="classOne" class="pojo.Class">
+    <bean id="classOne" class="com.SprintLearning.transaction.pojo.Class">
         <property name="cId" value="1"></property>
         <property name="cName" value="1班"></property>
 <!--        <property name="students">-->
@@ -69,7 +69,7 @@
         <property name="students" ref="studentList"></property>
     </bean>
 
-    <bean id="studentFive" class="pojo.Student">
+    <bean id="studentFive" class="com.SprintLearning.transaction.pojo.Student">
         <property name="sId" value="1003"></property>
         <property name="sName" value="wangwu"></property>
         <property name="age" value="25"></property>
@@ -79,26 +79,26 @@
         <property name="cls.cName" value="2班"></property>
     </bean>
 
-    <bean id="studentSix" class="pojo.Student">
+    <bean id="studentSix" class="com.SprintLearning.transaction.pojo.Student">
         <property name="sId" value="1003"></property>
         <property name="sName" value="wangwu"></property>
         <property name="age" value="25"></property>
         <property name="gender" value="男"></property>
         <property name="cls">
-            <bean id="classInner" class="pojo.Class">
+            <bean id="classInner" class="com.SprintLearning.transaction.pojo.Class">
                 <property name="cId" value="3"></property>
                 <property name="cName" value="3班"></property>
             </bean>
         </property>
     </bean>
 
-    <bean id="studentSeven" class="pojo.Student">
+    <bean id="studentSeven" class="com.SprintLearning.transaction.pojo.Student">
         <property name="sId" value="1003"></property>
         <property name="sName" value="wangwu"></property>
         <property name="age" value="25"></property>
         <property name="gender" value="男"></property>
         <property name="cls">
-            <bean id="classInner" class="pojo.Class">
+            <bean id="classInner" class="com.SprintLearning.transaction.pojo.Class">
                 <property name="cId" value="3"></property>
                 <property name="cName" value="3班"></property>
             </bean>
@@ -112,7 +112,7 @@
         </property>
     </bean>
 
-    <bean id="studentEight" class="pojo.Student"
+    <bean id="studentEight" class="com.SprintLearning.transaction.pojo.Student"
           p:sId="1006"
           p:age="18"></bean>
 

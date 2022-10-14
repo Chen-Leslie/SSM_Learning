@@ -14,7 +14,7 @@
             alias：设置某个类型的别名，若不设置该属性，那么该类型拥有默认的别名，即类名且不区分大小写
     -->
     <typeAliases>
-        <typeAlias type="com.mybatis.pojo.User" alias="User"/>
+        <typeAlias type="com.mybatis.User" alias="User"/>
         <!--  通过包来设置类型别名，指定包下所有的类所有的类型将全部拥有默认的别名，即类名且不区分大小写  -->
         <package name="com.mybatis.pojo"/>
     </typeAliases>

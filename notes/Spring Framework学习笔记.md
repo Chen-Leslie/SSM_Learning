@@ -75,7 +75,7 @@
         name:设置需要赋值的属性(和set方法有关)
         value:设置为属性所赋的值
     -->
-    <bean id="studentTwo" class="pojo.Student">
+    <bean id="studentTwo" class="Student">
         <property name="sId" value="1001"></property>
         <property name="age" value="23"></property>
         <property name="sName" value="zhangsan"></property>
@@ -119,17 +119,17 @@
   - 为类属性赋值
     - 利用 property 标签中的 ref 属性，ref属性的作用是引用IOC容器中的bean的id
     ```xml
-      <bean id="studentFour" class="pojo.Student">
+      <bean id="studentFour" class="Student">
         <property name="cls" ref="classOne"></property>
       </bean>
-      <bean id="classOne" class="pojo.Class">
+      <bean id="classOne" class="Class">
         <property name="cId" value="1"></property>
         <property name="cName" value="1班"></property>
       </bean>
     ```
     - 级联方式，但是需要保证提前为class属性类赋值或者实例化
     ```xml
-    <bean id="studentFive" class="pojo.Student">
+    <bean id="studentFive" class="Student">
         <property name="cls" ref="classOne"></property>
         <property name="cls.cId" value="2"></property>
         <property name="cls.cName" value="2班"></property>
@@ -137,9 +137,9 @@
     ```
     - 内部bean
     ```xml
-    <bean id="studentSix" class="pojo.Student">
+    <bean id="studentSix" class="Student">
         <property name="cls">
-            <bean id="classInner" class="pojo.Class">
+            <bean id="classInner" class="Class">
                 <property name="cId" value="3"></property>
                 <property name="cName" value="3班"></property>
             </bean>
@@ -149,7 +149,7 @@
   - 为数组属性赋值
     - 利用property标签下的array子标签，array内容如果是字面量则直接用value，如果是类则可以用ref
     ```xml
-    <bean id="studentSix" class="pojo.Student">
+    <bean id="studentSix" class="Student">
         <property name="hobbies">
             <array>
                 <value>抽烟</value>
@@ -162,7 +162,7 @@
   - 为列表属性赋值
     - 利用property标签下的list子标签，list内容如果是字面量则直接用value，如果是类则可以用ref
     ```xml
-    <bean id="classOne" class="pojo.Class">
+    <bean id="classOne" class="Class">
         <property name="students">
             <list>
                 <ref bean="studentOne"></ref>
@@ -179,22 +179,22 @@
         <ref bean="studentTwo"></ref>
         <ref bean="studentThree"></ref>
     </util:list>
-    <bean id="classOne" class="pojo.Class">
+    <bean id="classOne" class="Class">
         <property name="students" ref="studentList"></property>
     </bean>
     ```
   - 为Map集合属性赋值
     - 利用property标签下面的Map子标签，使用entry子标签表示一个键值对
     ```xml
-    <bean id="teacherOne" class="pojo.Teacher">
+    <bean id="teacherOne" class="Teacher">
         <property name="tId" value="1"></property>
         <property name="tName" value="t1"></property>
     </bean>
-    <bean id="teacherTwo" class="pojo.Teacher">
+    <bean id="teacherTwo" class="Teacher">
         <property name="tId" value="2"></property>
         <property name="tName" value="t2"></property>
     </bean>
-    <bean id="studentFour" class="pojo.Student">
+    <bean id="studentFour" class="Student">
         <property name="teacherMap">
             <map>
                 <entry key="1" value-ref="teacherOne"></entry>
@@ -205,7 +205,7 @@
     ```
     - 利用util:map
     ```xml
-    <bean id="studentFour" class="pojo.Student">
+    <bean id="studentFour" class="Student">
         <property name="teacherMap" ref="TeacherMap"></property>
     </bean>
     <util:map id="TeacherMap">
@@ -215,7 +215,7 @@
     ```
   - p命名空间
       ```xml
-      <bean id="studentSeven" class="pojo.Student"
+      <bean id="studentSeven" class="Student"
             p:sId="1006"
             p:age="18">
       </bean>
@@ -442,4 +442,133 @@
         @Before("PointCut()")
     ```
   - 连接点信息：在通知方法的参数位置设置JoinPoint类型的参数，就可以获取连接点所对应方法的信息
-  - 
+  - 切面的优先级：可以通过@Order()注解的value属性设置优先级，默认为Integer的最大值，value的属性值越小，优先级越高
+### 3.4 基于xml的AOP
+
+```xml
+    <aop:config>
+        <!--   设置一个公共的切入点表达式  -->
+        <aop:pointcut id="pointCut" expression="execution(* com.SpringLearning.xml.CalculatorImpl.*(..))"/>
+        <!--   将IOC容器中的某一个bean设置为切面  -->
+        <aop:aspect ref="loggerAspect">
+            <aop:before method="beforeAdviceMethod" pointcut-ref="pointCut"></aop:before>
+            <aop:after method="afterAdviceMethod" pointcut-ref="pointCut"></aop:after>
+            <aop:after-returning method="afterReturningAdviceMethod" pointcut-ref="pointCut" returning="result"></aop:after-returning>
+            <aop:after-throwing method="afterThrowingAdviceMethod" pointcut-ref="pointCut" throwing="exception"></aop:after-throwing>
+            <aop:around method="aroundAdviceMethod" pointcut-ref="pointCut"></aop:around>
+        </aop:aspect>
+        <aop:aspect ref="validateAspect" order="1">
+            <aop:before method="beforeAdviceMethod" pointcut-ref="pointCut"></aop:before>
+        </aop:aspect>
+    </aop:config>
+   ```
+
+## 4. 声明式事务
+### 4.1 JdbcTemplate
+### 4.2 声明式事务概念
+#### 4.2.1 编程式事务
+  - <p>事务功能的相关操作全部通过自己编写代码来实现</p>
+  - 缺陷：
+    - 细节未被屏蔽
+    - 难以复用
+#### 4.2.2 声明式事务
+  - 由框架进行将固定模式的代码抽取出来并进行封装，封装以后只需要在配置文件中进行简单配置即可
+### 4.3 基于注解的声明式事务
+#### 4.3.1 声明式事务的配置步骤
+  - 在spring配置文件中配置事务管理器
+  - 开启事务的注解驱动
+  - 只需要在需要被事务管理的方法上添加@Transactional注解就会被事务管理
+    - @Transactional可以标注在方法上
+    - @Transactional可以标注在类上，则类中所有方法都会被事务管理
+#### 4.3.2 配置事务管理器
+```xml
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="druidDataSource"></property>
+    </bean>
+```
+#### 4.3.3 开启事务的注解驱动
+<p>将使用@Transactional标注的方法或类中所有的方法使用事务进行管理</p>
+<p>transaction-manager属性设置事务管理器的id，若事务管理的bean的id为transactionManager，则可以不写</p>
+```xml
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+```
+
+#### 4.3.4 事务属性：只读
+<p>告诉数据库，这个操作不涉及写操作</p>
+
+```java
+@Transactional(readOnly = true)
+```
+
+#### 4.3.5 事务属性：超时
+<p>超时回滚，释放资源</p>
+
+```java
+@Transactional(timeout = 3)
+```
+
+#### 4.3.6 事务属性：回滚策略
+<p>声明式事务默认只针对运行时异常回滚，编译时异常不回滚</p>
+<p>可以通过@Transactional中的属性设置回滚策略</p>
+  
+  - rollbackFor：需要设置一个class类型的对象，表示出现什么而回滚
+  - rollbackForClassName：需要设置一个字符串类型的全类名，表示出现什么而回滚
+  - norollbackFor：需要设置一个class类型的对象，表示出现什么不回滚
+  - rollbackForClassName：需要设置一个字符串类型的全类名，表示出现什么不回滚
+
+#### 4.3.7 事务属性：事务隔离级别
+<p>声明式事务默认只针对运行时异常回滚，编译时异常不回滚</p>
+
+隔离级别一共有四种
+  - 读未提交 READ UNCOMMITTED：允许Transaction01读取Transaction02未提交的修改
+  - 读已提交 READ COMMITTED：要求Transaction01只能读取Transaction02已提交的修改。
+  - 可重复读 REPEATABLE READ：确保Transaction01可以多次从一个字段中读取到相同的值，即Transaction01执行期间禁止其它
+    事务对这个字段进行更新。
+  - 串行化 SERIALIZABLE：确保Transaction01可以多次从一个表中读取到相同的行，在Transaction01执行期间，禁止其它
+    事务对这个表进行添加、更新、删除操作。可以避免任何并发问题，但性能十分低下。
+
+各个隔离级别解决并发问题的能力：
+
+|隔离级别|脏读|不可重复读|幻读|
+:----------:|:--------:|:-------:|:-------:
+|READ UNCOMMITTED|y|y|y|
+|READ COMMITTED|n|y|y|
+|REPEATABLE READ|n|n|y|
+|SERIALIZABLE|n|n|n|
+
+各类数据库对事务隔离级别的支持
+
+|隔离级别|Oracle|MySQL|
+:----:|:---:|:---:
+|READ UNCOMMITTED|n|y|
+|READ COMMITTED|y(default)|y|
+|REPEATABLE READ|n|y(default)|
+|SERIALIZABLE|y|y|
+
+使用方式：
+```java
+@Transactional(isolation=xxx)
+```
+
+#### 4.3.8 事务属性：事务传播行为
+<p>当事务方法被另一个事务方法调用时，必须指定事务应该如何传播。例如：方法可能继续在现有事务中
+运行，也可能开启一个新事务，并在自己的事务中运行。</p>
+<p>比如在结账系统中，checkout功能具有自己的事务，结账两本书时，需要调用buyBook两次，但是buyBook具有自己的事务，如果 第一本结算成功，第二本结算未成功，则回滚时是全部回滚，还是第二本买书事务回滚</p>
+
+  - 在上述例子中，bugBook的事务默认情况是采用checkout的事务，即默认采用调用者的事务
+  - 若需要使用自己的事务，则在自己事务的@Transactional中添加属性
+  ```java
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+  ```
+  - @Transactional(propagation = Propagation.REQUIRED)，默认情况，表示如果当前线程上有已经开
+    启的事务可用，那么就在这个事务中运行。经过观察，购买图书的方法buyBook()在checkout()中被调
+    用，checkout()上有事务注解，因此在此事务中执行。所购买的两本图书的价格为80和50，而用户的余
+    额为100，因此在购买第二本图书时余额不足失败，导致整个checkout()回滚，即只要有一本书买不
+    了，就都买不了
+  - @Transactional(propagation = Propagation.REQUIRES_NEW)，表示不管当前线程上是否有已经开启
+    的事务，都要开启新事务。同样的场景，每次购买图书都是在buyBook()的事务中执行，因此第一本图
+    书购买成功，事务结束，第二本图书购买失败，只在第二次的buyBook()中回滚，购买第一本图书不受
+    影响，即能买几本就买几本
+
+
+ 

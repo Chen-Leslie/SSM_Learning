@@ -1,4 +1,4 @@
-package pojo;
+package com.SprintLearning.transaction.pojo;
 
 /**
  * @author cbr

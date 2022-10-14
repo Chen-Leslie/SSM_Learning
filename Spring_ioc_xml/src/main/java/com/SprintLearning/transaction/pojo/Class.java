@@ -1,4 +1,4 @@
-package pojo;
+package com.SprintLearning.transaction.pojo;
 
 import java.util.List;
 

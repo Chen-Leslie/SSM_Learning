@@ -30,7 +30,7 @@
         resultType：设置结果类型，即查询的数据要转换为的Java类型
         resultMap：自定义映射，处理多对一或一对多的映射关系
     -->
-    <select id="getUserByID" resultType="com.mybatis.pojo.User">
+    <select id="getUserByID" resultType="com.mybatis.User">
         select * from t_user where id = 1
     </select>
 

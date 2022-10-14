@@ -10,7 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @version 1.0
  * @date 2022-10-13
  */
-public class AopTest {
+public class AopTestByAnnotation {
     @Test
     public void testAopByAnnotation(){
         ApplicationContext ioc = new ClassPathXmlApplicationContext("aop-annotation.xml");
