@@ -570,5 +570,29 @@
     书购买成功，事务结束，第二本图书购买失败，只在第二次的buyBook()中回滚，购买第一本图书不受
     影响，即能买几本就买几本
 
+### 4.4 基于XML的声明式事务
+```xml
+    <!--  配置事务管理器  -->
+    <bean class="org.springframework.jdbc.datasource.DataSourceTransactionManager" id="transactionManager">
+        <property name="dataSource" ref="druidDataSource"></property>
+    </bean>
+
+    <!--  配置事务通知  -->
+    <tx:advice id="tx" transaction-manager="transactionManager">
+        <!--  针对不同连接点方法配置不同的管理参数  -->
+        <tx:attributes>
+            <!--  若不在此配置需要事务管理的方法，则不会对连接点方法进行事务管理  -->
+            <tx:method name="buyBook" read-only="false"/>
+            <!--  可以在方法命名中使用通配符*，表示get开头的方法都是只读  -->
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="*" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+    
+    <!--  将service.Impl下的所有类以及所有方法纳入事务管理中  -->
+    <aop:config>
+        <aop:advisor advice-ref="tx" pointcut="execution(* com.SprintLearning.transaction.service.Impl.*.*(..))"></aop:advisor>
+    </aop:config>
+```
 
  
