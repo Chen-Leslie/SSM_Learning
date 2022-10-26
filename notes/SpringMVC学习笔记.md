@@ -256,3 +256,316 @@ return "success";
 }
 //最终输出的内容为-->id:1,username:admin
 ```
+
+## 4 SpringMVC获取请求参数
+### 4.1 通过servletAPI获取
+<p>将HttpServletRequest作为控制器方法的形参，此时HttpServletRequest类型的参数表示封装了当前请
+求的请求报文的对象
+
+```java
+    @RequestMapping("/param/servletAPI")
+    public String getParamByServletAPI(HttpServletRequest request){
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        System.out.println("username:" + username + "," + "password:" + password);
+        return "success";
+    }
+```
+
+### 4.2 通过控制器方法的形参获取请求参数
+<p>只需要在控制器方法的形参位置设置一个形参，形参名字与请求参数一致即可
+
+```java
+    @RequestMapping("/param")
+    public String getParam(String username, String password){
+        System.out.println("username:" + username + "," + "password:" + password);
+        return "success";
+    }
+```
+
+#### 4.2.1 @RequestParam
+<p>当请求参数与形参名字不一致时，将请求参数和控制器方法的形参绑定
+<p>@RequestParam的三个属性
+  
+  - value：设置和形参绑定的请求参数的名字
+  - required：设置是否必须传输value所对应的请求参数，默认为true，表示必须传输，否则报错400：Required String parameter 'xxx' is not present
+  - defaultValue：设置当没有传输value所对应的请求参数，为形参所设置的默认值，此时和required属性无关
+
+#### 4.2.2 @RequestHeader
+<p>将请求头信息和控制器方法的形参绑定</p>
+<p>注解一共有三个属性：value、required、defaultValue，用法同@RequestParam</p>
+
+#### 4.2.3 @CookieValue
+<p>将cookie数据和控制器方法的形参绑定</p>
+<p>注解一共有三个属性：value、required、defaultValue，用法同@RequestParam</p>
+
+#### 4.2.4 通过POJO获取请求参数
+<p>可以在控制器方法的形参位置设置一个实体类类型的形参，此时若浏览器传输的请求参数的参数名和实
+体类中的属性名一致，那么请求参数就会为此属性赋值
+
+```java
+    @RequestMapping("/param/pojo")
+    public String getParamByPojo(User user){
+        System.out.println(user);
+        return "success";
+    }
+```
+
+```html
+    <form th:action="@{/param/pojo}">
+        用户名:<input type="text" name="username"><br>
+        密码:<input type="password" name="password"><br>
+        <input type="submit" value="登录"><br>
+    </form>
+```
+
+### 4.3 解决获取请求参数的乱码问题
+<p>解决获取请求参数的乱码问题，可以使用SpringMVC提供的编码过滤器CharacterEncodingFilter，但是
+必须在web.xml中进行注册</p>
+
+```xml
+<filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+        <param-name>encoding</param-name>
+        <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>forceEncoding</param-name>
+        <param-value>true</param-value>
+    </init-param>
+</filter>
+<filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+``Remark:SpringMVC中处理编码的过滤器一定要配置到其他过滤器之前，否则无效``
+
+## 5 域对象共享数据
+### 5.1 使用servletAPI向request域对象共享数据
+
+```java
+    @RequestMapping("/testServletAPI")
+    public String testServletAPI(HttpServletRequest request){
+        request.setAttribute("testScope", "hello,servletAPI");
+        return "success";
+    }
+```
+
+### 5.2 使用ModelAndView向request域对象共享数据
+<p>使用ModelAndView时，可以使用Model功能向请求域中共享数据，使用View功能设置逻辑视图，但是控制器方法一定要返回ModelAndView</p>
+
+```java
+    @RequestMapping("/test/mav")
+    public ModelAndView testMAV(){
+        /**
+         * ModelAndView包含Model和View的功能
+         * Model：向请求域中共享数据
+         * View：设置逻辑视图实现页面跳转
+         */
+        ModelAndView modelAndView = new ModelAndView();
+        // 向请求域中共享数据
+        modelAndView.addObject("testRequestScope","hello, ModelAndView");
+        // 设置逻辑视图
+        modelAndView.setViewName("success");
+        return modelAndView;
+    }
+```
+
+### 5.3 使用Model向request域对象共享数据
+
+```java
+    @RequestMapping("/test/model")
+    public String testModel(Model model){
+        model.addAttribute("testRequestScope", "hello, Model");
+        return "success";
+    }
+```
+
+### 5.4 使用map向request域对象共享数据
+
+```java
+    @RequestMapping("/test/map")
+    public String testModelMap(Map<String, Object> map){
+        map.put("testRequestScope", "hello, map");
+        return "success";
+    }
+```
+
+### 5.5 使用ModelMap向request域对象共享数据
+
+```java
+    @RequestMapping("/test/modelMap")
+    public String testModelMap(ModelMap modelMap){
+        modelMap.addAttribute("testRequestScope", "hello, ModelMap");
+        return "success";
+    }
+```
+
+### 5.6 Model、ModelMap、Map的关系
+<p>Model、ModelMap、Map类型的参数其实本质上都是 BindingAwareModelMap 类型的</p>
+
+```java
+    public interface Model{}
+    public class ModelMap extends LinkedHashMap<String, Object> {}
+    public class ExtendedModelMap extends ModelMap implements Model {}
+    public class BindingAwareModelMap extends ExtendedModelMap
+```
+
+### 5.7 向session域共享数据
+
+```java
+    @RequestMapping("/testSession")
+    public String testSession(HttpSession session){
+        session.setAttribute("testSessionScope", "hello,session");
+        return "success";
+    }
+```
+
+### 5.8 向application域共享数据
+
+```java
+    @RequestMapping("/testApplication")
+    public String testApplication(HttpSession session){
+        ServletContext application = session.getServletContext();
+        application.setAttribute("testApplicationScope", "hello,application");
+        return "success";
+    }
+```
+
+## 6 SpringMVC的视图
+
+<p>SpringMVC中的视图是View接口，视图的作用渲染数据，将模型Model中的数据展示给用户</p>
+<p>SpringMVC视图的种类很多，默认有转发视图和重定向视图</p>
+<p>当工程引入jstl的依赖，转发视图会自动转换为JstlView</p>
+<p>若使用的视图技术为Thymeleaf，在SpringMVC的配置文件中配置了Thymeleaf的视图解析器，由此视
+图解析器解析之后所得到的是ThymeleafView</p>
+
+### 6.1 ThymeleafView
+<p>当控制器方法中所设置的视图名称没有任何前缀时，此时的视图名称会被SpringMVC配置文件中所配置
+的视图解析器解析，视图名称拼接视图前缀和视图后缀所得到的最终路径，会通过转发的方式实现跳转</p>
+
+
+### 6.2 转发视图
+<p>SpringMVC中默认的转发视图是InternalResourceView</p>
+<p>SpringMVC中创建转发视图的情况：</p>
+<p>当控制器方法中所设置的视图名称以"forward:"为前缀时，创建InternalResourceView视图，此时的视图名称不会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"forward:"去掉，剩余部
+分作为最终路径通过转发的方式实现跳转</p>
+<p>例如"forward:/"，"forward:/employee"</p>
+
+```java
+    @RequestMapping("/test/view/forward")
+    public String testInternalResourceView(){
+        return "forward:/test/model";
+    }
+```
+
+### 6.3 重定向视图
+<p>SpringMVC中默认的重定向视图是RedirectView</p>
+<p>当控制器方法中所设置的视图名称以"redirect:"为前缀时，创建RedirectView视图，此时的视图名称不
+会被SpringMVC配置文件中所配置的视图解析器解析，而是会将前缀"redirect:"去掉，剩余部分作为最
+终路径通过重定向的方式实现跳转</p>
+
+```java
+    @RequestMapping("/test/view/redirect")
+    public String testRedirectView(){
+        return "redirect:/test/model";
+    }
+```
+
+### 6.4 视图控制器view-controller
+<p>当控制器方法中，仅仅用来实现页面跳转，即只需要设置视图名称时，可以将处理器方法使用view-controller标签进行表示</p>
+
+```xml
+<!--开启mvc注解驱动-->
+<mvc:annotation-driven/>
+<!--视图控制器，为当前请求直接设置视图名称，实现页面跳转-->
+<mvc:view-controller path="/" view-name="index"></mvc:view-controller>
+```
+
+<p>当SpringMVC中设置任何一个view-controller时，其他控制器中的请求映射将全部失效，此时需
+要在SpringMVC的核心配置文件中设置开启mvc注解驱动的标签：</p>
+
+```xml
+<mvc:annotation-driven/>
+```
+
+## 7 RESTful
+
+### 7.1 RESTful简介
+<p>REST：Representational State Transfer，表现层资源状态转移。</p>
+
+  - 资源：
+    - 资源是一种看待服务器的方式，即，将服务器看作是由很多离散的资源组成。每个资源是服务器上一个
+      可命名的抽象概念。因为资源是一个抽象的概念，所以它不仅仅能代表服务器文件系统中的一个文件、
+      数据库中的一张表等等具体的东西，可以将资源设计的要多抽象有多抽象，只要想象力允许而且客户端
+      应用开发者能够理解。与面向对象设计类似，资源是以名词为核心来组织的，首先关注的是名词。一个
+      资源可以由一个或多个URI来标识。URI既是资源的名称，也是资源在Web上的地址。对某个资源感兴
+      趣的客户端应用，可以通过资源的URI与其进行交互。
+  - 资源的表述：
+    - 资源的表述是一段对于资源在某个特定时刻的状态的描述。可以在客户端-服务器端之间转移（交
+      换）。资源的表述可以有多种格式，例如HTML/XML/JSON/纯文本/图片/视频/音频等等。资源的表述格
+      式可以通过协商机制来确定。请求-响应方向的表述通常使用不同的格式。
+  - 状态转移
+    - 状态转移说的是：在客户端和服务器端之间转移（transfer）代表资源状态的表述。通过转移和操作资
+      源的表述，来间接实现操作资源的目的。
+
+### 7.2 RESTful实现
+<p>具体说，就是 HTTP 协议里面，四个表示操作方式的动词：GET、POST、PUT、DELETE。</p>
+<p>它们分别对应四种基本操作：GET 用来获取资源，POST 用来新建资源，PUT 用来更新资源，DELETE
+用来删除资源。</p>
+<p>REST 风格提倡 URL 地址使用统一的风格设计，从前到后各个单词使用斜杠分开，不使用问号键值对方
+式携带请求参数，而是将要发送给服务器的数据作为 URL 地址的一部分，以保证整体风格的一致性。</p>
+
+|操作|传统方式|REST风格|
+:----:|:----:|:----:
+|查询操作|getUserById?id=1|user/1-->get请求方式|
+|保存操作|saveUser|user-->post请求方式|
+|删除操作|deleteUser?id=1|user/1-->delete请求方式|
+|更新操作|updateUser|user-->put请求方式|
+
+## 7.3 HiddenHttpMethodFilter
+<p>由于浏览器只支持发送get和post方式的请求，那么该如何发送put和delete请求呢？
+<p>SpringMVC 提供了 HiddenHttpMethodFilter 帮助我们将 POST 请求转换为 DELETE 或 PUT 请求
+HiddenHttpMethodFilter 处理put和delete请求的条件：
+  
+  - 当前请求的请求方式必须为post
+  - 当前请求必须传输请求参数_method
+
+<p>满足以上条件，HiddenHttpMethodFilter 过滤器就会将当前请求的请求方式转换为请求参数
+_method的值，因此请求参数_method的值才是最终的请求方式
+<p>在web.xml中注册HiddenHttpMethodFilter
+
+```xml
+<filter>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+</filter-mapping>
+```
+
+```html
+    <form th:action="@{/user}" method="post">
+        <input type="hidden" name="_method" value="put">
+        <input type="submit" value="修改用户信息">
+    </form>
+```
+
+<p>目前为止，SpringMVC中提供了两个过滤器：
+
+  - CharacterEncodingFilter和
+  - HiddenHttpMethodFilter
+<p>在web.xml中注册时，必须先注册CharacterEncodingFilter，再注册HiddenHttpMethodFilter
+原因：
+
+  - 在CharacterEncodingFilter中通过 request.setCharacterEncoding(encoding) 方法设置字
+符集的 
+  - request.setCharacterEncoding(encoding) 方法要求前面不能有任何获取请求参数的操作
+  - 而 HiddenHttpMethodFilter 恰恰有一个获取请求方式的操作：String paramValue = request.getParameter(this.methodParam);
+
+

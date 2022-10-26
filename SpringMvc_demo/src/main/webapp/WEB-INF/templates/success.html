@@ -5,6 +5,9 @@
     <title>成功</title>
 </head>
 <body>
-    Successfully!
+    <h1>Successfully!</h1>
+    <p th:text="${testRequestScope}"></p>
+    <p th:text="${session.testSessionScope}"></p>
+    <p th:text="${application.testApplicationScope}"></p>
 </body>
 </html>

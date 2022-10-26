@@ -6,19 +6,41 @@
 </head>
 <body>
     <p>Index.html</p>
-    <a th:href="@{/test/testRequestMapping}">测试@RequestMapping映射</a>
-    <br>
-    <a th:href="@{/test/hello}">测试@RequestMapping的value属性数组</a>
-    <br>
-    <form th:action="@{/test/hello}" method="post">
-        <input type="submit" value="测试@RequestMapping的method属性">
-    </form>
-    <br>
+
+<a th:href="@{/test/testRequestMapping}">测试@RequestMapping映射</a><br>
+<a th:href="@{/test/hello}">测试@RequestMapping的value属性数组</a><br>
+<form th:action="@{/test/hello}" method="post">
+    <input type="submit" value="测试@RequestMapping的method属性">
+</form><br>
 <!--    <form th:action="@{/test/hello?username='admin'}" method="post">-->
-    <form th:action="@{/test/hello(username='admin')}" method="post">
-        <input type="submit" value="测试@RequestMapping的param属性">
-    </form>
-    <br>
-    <a th:href="@{/test/testRest/1/admin}">测试路径中的占位符-->/testRest</a><br>
+<form th:action="@{/test/hello(username='admin')}" method="post">
+    <input type="submit" value="测试@RequestMapping的param属性">
+</form><br>
+<a th:href="@{/test/testRest/1/admin}">测试路径中的占位符-->/testRest</a><br>
+
+<hr>
+
+<form th:action="@{/param/pojo}" method="get">
+    用户名:<input type="text" name="username"><br>
+    密码:<input type="password" name="password"><br>
+    <input type="submit" value="登录"><br>
+</form>
+
+<hr>
+
+<a th:href="@{/test/mav}">测试通过ModelAndView向请求域共享数据</a><br>
+<a th:href="@{/test/model}">测试通过Model向请求域共享数据</a><br>
+<a th:href="@{/test/modelMap}">测试通过ModelMap向请求域共享数据</a><br>
+<a th:href="@{/test/map}">测试通过Map向请求域共享数据</a><br>
+<a th:href="@{/test/session}">测试向会话域共享数据</a><br>
+<a th:href="@{/test/application}">测试向应用域共享数据</a><br>
+
+<hr>
+
+<a th:href="@{/test/view/thymeleaf}">测试SpringMVC中的thymeleaf视图</a><br>
+<a th:href="@{/test/view/forward}">测试SpringMVC中的InternalResourceView视图</a><br>
+<a th:href="@{/test/view/redirect}">测试SpringMVC中的RedirectView视图</a><br>
+
+
 </body>
 </html>
